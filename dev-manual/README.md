@@ -1,6 +1,18 @@
 ### Jak na databázi
 * cloud databáze založit účet na [Neo4j](https://neo4j.com/).
+    * veškeré ovládání je přes web Neo4j.
 * pro lokální databázi stáhnout [Community server, Neo4j Desktop a Cypher shell](https://neo4j.com/download-center/#community).
+    * Community server spustí přes terminál Neo4j server. Tento server poskytuje webové rozhraní na http://localhost:7474/. Nebo po instalaci Cypher shellu se dá připojit i přes něj.
+    * Neo4j desktop je "IDE", které spouští svůj vlastní server, nebo je možné připojit i remote server - cloud nebo community server
+    * Součástí archivu community serveru je i Cypher shell a admin-tool
+
+### Užitečné odkazy
+* [Documentace](https://neo4j.com/docs/)
+* [Getting started](https://neo4j.com/developer/get-started/)
+* [Bonus odkazy](https://neo4j.com/developer/resources/#docs-manuals)
+* [Cypher cheat sheet 1](https://neo4j.com/docs/cypher-refcard/current/)
+* [Cypher cheat sheet 2](https://neo4j.com/docs/cypher-cheat-sheet/current/)
+* [How to Neo4j in Python](https://neo4j.com/docs/python-manual/current/)
 
 ### Nodes
 * label 
