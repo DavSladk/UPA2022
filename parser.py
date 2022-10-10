@@ -16,7 +16,10 @@ def node_to_dict(node):
         if child.tag not in ND:
             ND[child.tag] = node_to_dict(child)
         else:
-            ND[child.tag] = [ND[child.tag]] + [node_to_dict(child)]
+            if ND[child.tag] is list:
+                ND[child.tag].append(node_to_dict(child))
+            else:
+                ND[child.tag] = [ND[child.tag]] + [node_to_dict(child)]
     return ND
 
 # Create a generator object returning xml files with data
@@ -42,6 +45,9 @@ def parse_file(file):
     DT = {}
     DT["locations"] = []
     DT["timings"] = []
+    DT["network"] = []
+    DT["creation"] = root.find(".//CZPTTCreation").text
+    DT["ids"] = node_to_dict(root.find(".//Identifiers"))
     DT["calendar"] = node_to_dict(root.find(".//PlannedCalendar"))
 
     # Parsing
@@ -49,6 +55,8 @@ def parse_file(file):
         DT["locations"].append(node_to_dict(location))
     for timing in root.findall(".//TimingAtLocation"):
         DT["timings"].append(node_to_dict(timing))
+    for network in root.findall("./NetworkSpecificParameter"):
+        DT["network"].append(node_to_dict(network))
     return DT
 
 # Tohle je zatm jen demo, ale parsuje to vsechny xmlka ve slozce
@@ -60,9 +68,12 @@ def main():
     print("*************************************************")
     for parsed in parsed_data_generator():
         filecount += 1
+        print(f'ids: {parsed["ids"]}')
         print(f'Vychozi stanice: {parsed["locations"][0]}\n     {parsed["timings"][0]}\n')
         print(f'Cilova stanice:  {parsed["locations"][-1]}\n    {parsed["timings"][-1]}\n')
-        print(f'Kalenar: {parsed["calendar"]}')
+        print(f'Kalenar: {parsed["calendar"]}\n')
+        print(f'Creation: {parsed["creation"]}')
+        print(f'Network: {parsed["network"]}')
         print(f"************************************************* {filecount} ***************")
     print(f"Parsed {filecount} files.")
 
