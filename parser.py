@@ -2,6 +2,20 @@
 # parser.py app for parsing xml files
 
 import xml.etree.ElementTree as ET, os
+from datetime import datetime, timedelta
+
+# This function converts start date and bitmapdays
+# To a list of valid dates
+def cal_to_listofdays(calendar):
+    binstr = calendar['BitmapDays']
+    startdate = calendar['ValidityPeriod']['StartDateTime']
+    startdate = startdate[:startdate.rfind('T'):]
+    ret = []
+    start = datetime.strptime(startdate, "%Y-%m-%d")
+    for i in range(len(binstr)):
+        if binstr[i] == '1':
+            ret.append(str(start + timedelta(days=i))[2:10:])
+    return ret
 
 # Folder with all xml files
 FOLDER_PATH = "testinputs"
@@ -49,6 +63,7 @@ def parse_file(file):
     DT["creation"] = root.find(".//CZPTTCreation").text
     DT["ids"] = node_to_dict(root.find(".//Identifiers"))
     DT["calendar"] = node_to_dict(root.find(".//PlannedCalendar"))
+    DT["list_calendar"] = cal_to_listofdays(DT['calendar'])
 
     # Parsing
     for location in root.findall(".//Location"):
@@ -72,6 +87,7 @@ def main():
         print(f'Vychozi stanice: {parsed["locations"][0]}\n     {parsed["timings"][0]}\n')
         print(f'Cilova stanice:  {parsed["locations"][-1]}\n    {parsed["timings"][-1]}\n')
         print(f'Kalenar: {parsed["calendar"]}\n')
+        print(f'Kalendar v listu: {parsed["list_calendar"]}')
         print(f'Creation: {parsed["creation"]}')
         print(f'Network: {parsed["network"]}')
         print(f"************************************************* {filecount} ***************")
