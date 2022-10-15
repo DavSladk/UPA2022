@@ -1,3 +1,4 @@
+```
 (:PA)
 PK -> Core
 Company
@@ -57,3 +58,4 @@ AssociatedAttachedTrainID //nepoužívá se
 AssociatedAttachedOTN // nenašel jsem, že se používá
 OperationalTrainNumber
 NetworkSpecificParameters // ve formátu name:value
+```
