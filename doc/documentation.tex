@@ -1,0 +1,148 @@
+% Copyright 2022 by Marek Rychly <rychly@fit.vut.cz>.
+%
+\documentclass[10pt,xcolor=pdflatex,dvipsnames,table,oneside]{book}
+% babel and encoding
+\usepackage[czech]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{csquotes}% correct/formal language-specific quotations
+\usepackage{microtype}% character protrusion, font expansion, adjustment of interword spacing, additional kerning, tracking, etc.
+\usepackage{hyperref}% hyper-refs in PDF
+
+\author{
+    František Koleček, \href{mailto:xkolec08@stud.fit.vut.cz}{xkolec08@stud.fit.vut.cz} \\
+    Tomáš Moravčík, \href{mailto:xmorav41@stud.fit.vut.cz}{xmorav41@stud.fit.vut.cz} \\
+    David Sladký, \href{mailto:xsladk07@stud.fit.vut.cz}{xsladk07@stud.fit.vut.cz}
+    }
+\title{Ukládání rozsáhlých dat v NoSQL databázích}
+\date{zima 2022}
+
+\begin{document}
+
+\pagenumbering{roman}
+
+\hypersetup{pageanchor=false}% disable hyperref anchor to title page as maketitle enforce pagenumbering to arabic which colides the titlepage with the first arabic page below
+\maketitle
+\hypersetup{pageanchor=true}
+
+\tableofcontents
+
+\newpage% force page-break to start the page numbering on a new page
+\pagenumbering{arabic}
+
+\part{Analýza zdrojových dat a návrh jejich uložení v NoSQL databázi}
+
+\chapter{Analýza zdrojových dat}
+
+\paragraph{Cíl:}
+Zjistit a popsat, jaké datové sady budou pro úlohu v projektu potřeba a jaké jsou jejich vlastnosti tak,
+abychom mohli zvolit vhodný formát a způsob uložení v NoSQL databázi.
+
+\paragraph{Obsah:}
+Pro významné použité datové soubory určit nad rámec jejich veřejně přístupné dokumentaci alespoň následující:
+odkud a jak ho lze získat,
+jak často a jakým způsobem je tam aktualizován,
+jaké jsou (jen významné) části jeho struktury (pokud je strukturovaný, tj. elementy/sloupce a jejich datové typy, povinost/volitelnost, opakování, atp.;
+jen dále významné části, pokud pro zbytek lze udělat odkaz do veřejné dokumentace ke zdroji, existuje-li taková),
+jaký je identifikátor položek ve zdroji (pokud existuje) a v jakém kontextu/rozsahu a časovém rozmezí jsou jeho hodnoty jedinečné,
+jaké jsou případné odkazy z položek zdroje na položky dalších zdrojů (pokud tam takové jsou),
+jaké jsou možnosti seskupení položek ze zdroje na základě jejich hodnot (např. zaměstnance můžeme seskupt dle oddělení),
+případné speciální rysy dat ve zdroji (např. temporální či multimediální složky, geografická data, atp.),
+další poznámky důležité pro následný návrh (např. velikost zdroje, jeho chybovost, atp.).
+
+\paragraph{Prostředky:}
+Stručný strukturovaný text, odrážky, případně tabulky; případně s odkazy na konkrétní místa do veřejné dokumentace zdroje na Internetu.
+
+\paragraph{Fáze projektu:}
+Hned na začátku po seznámení se zdroji dat.
+
+\chapter{Návrh způsobu uložení dat}
+
+\paragraph{Cíl:}
+Po posouzení vlastností dat (z předchozí analýzy) a očekávaných dotazů (ze zadání) navrhnout vhodný způsob uložení dat do NoSQL databáze.
+Způsob uložená musí být vhodný z hlediska způsobu nahrávání dat ze zdroje do databáze (a to i průběžného doplňování či aktualizace, bez smazání celé databáze)
+a z hlediska rychlosti dotazování dat v databázi z aplikace s využitím vlastností NoSQL (s využitím klíčů a škálovatelnosti/distribuovanosti databáze).
+Data lze při nahrávání ze zdroje do databáze předzpracovávat, např. kombinovat či doplňovat, odvozovat pomocná data, předpočítávat agregace, atp.
+Takové předzpracování může trvat déle (kritérium vhodnosti při předzpracování v průběhu nahrávání není čas, ale vhodné využití obecných vlastností NoSQL, jako je sharding).
+
+\paragraph{Obsah:}
+Pro skupinu či každou podstatnou vlastnost dat z analýzy a dotaz ze zadání (pokud bude mít vliv na návrh) popsat,
+co znamená, jaký problém představuje, jaké je řešení, proč je zvolené řešení dobré a stručně jaké jsou případné alternativy.
+
+\paragraph{Prostředky:}
+Strukturovaný text (odstavce, sekce, odrážky, atd.), kde je popsán proces získání, předzpracování a uložení dat ze zdroje do databáze.
+Možno použít také pseudokód či diagramy popisující datové toky a použité struktury a vlastnosti NoSQL databází obecně.
+Každé návrhové rozhodnutí musí být řádně zdůvodněno (např. části se strukturou "dotaz/vlastnost", "problém", "řešení", "důvod", "alternativy").
+
+\paragraph{Fáze projektu:}
+Po analýze dat a analýze uživatelských požadavků na aplikaci, většinou souběžně s návrhem aplikace.
+
+\chapter{Zvolená NoSQL databáze}
+
+\paragraph{Cíl:}
+Rozhrnout a zdůvodnit jaký druh NoSQL databáze je vhodný (zdůvodnění plyne částečně již z předchozího návrhu) a jaký konkrétní produkt NoSQL databáze bude použit.
+
+\paragraph{Obsah:}
+Určit typ databáze a konkrétní produkt NoSQL, vypsat jeho vlastnosti,
+které jsou pro toto řešení užitečné (a jiné než u jiných typů a produktů NoSQL)
+a zdůvodnit jejich vhodnost v kontextu předchozího návrhu.
+
+\paragraph{Prostředky:}
+Stručný volný text (až několik kratších odstavců) s případným vyznačením podstatných části.
+
+\paragraph{Fáze projektu:}
+Zakončování návrhu a přechod k implementaci.
+
+\part{Návrh, implemetace a použití aplikace}
+
+\chapter{Návrh aplikace}
+
+\paragraph{Cíl:}
+Navrhnout hlavní části aplikace splňující požadavky zadání s důrazem na práci s na ni napojenou databází NoSQL či datovými zdroji
+(při jejich předzpracování a nahrávání do NoSQL databáze).
+
+\paragraph{Obsah:}
+Použité technologie (např. skriptovací jazyk, knihovny, atp.)
+a architektura (např. skript či sekvence skriptů pravidelně spouštěných v daných časových intervalech či v reakci na danou událost).
+Způsob technického řešení úloh ze zadání (jejich průběh v aplikaci) a konceptů z předchozího návrhu (struktury, algoritmy, toky dat, atp.).
+
+\paragraph{Prostředky:}
+Strukturovaný text (sekce, odstavce, odrážky, atp.), případně pseudokód či obrázky, doplňující technické detaily konceptů nastíněných v předchozím návrhu.
+Důraz je kladen na způsob realizace dotazů ze zadání.
+
+\paragraph{Fáze projektu:}
+Návrh aplikace a částečně po či souběžně s návrhem databáze.
+
+\chapter{Způsob použití}
+
+\paragraph{Cíl:}
+Poskytnout stručnou dokumentaci pro zprovoznění databáze a aplikace.
+
+\paragraph{Obsah:}
+Stručně popsat, jak celé řešení zprovoznit, tj. nasadit databázi i aplikaci vč. způsobu volání aplikace (příkazový řádek, parametry) pro úlohy
+předzpracování a nahrání dat ze zdroje do databáze a pro ulohy hledání nad databází tak, jak byly definovány v zadání.
+
+\paragraph{Prostředky:}
+Stručný text obsahující návod (popis) s ukázkami způsobu volání aplikace (např. pro skripty by to byl kód příkazového řadku).
+
+\paragraph{Fáze projektu:}
+Dokončování implementace, chystání dokumentace pro předání výsledného systému zákazníkovi.
+
+\chapter{Experimenty}
+
+\paragraph{Cíl:}
+Změřit, jak aplikace a databáze fungují v praxi.
+
+\paragraph{Obsah:}
+Popis výchozí konfigurace aplikace a nasazení databáze stroje, kde budou experimenty probíhat (HW a SW).
+Popis experimentů typicky představující nahrání dat ze zdroje do databáze či dotazy ze zedání s výslednými časy jejich provedení.
+Případné poznámky k výsledkům experimentů.
+
+\paragraph{Prostředky:}
+Strukturvaný text, případně tabulka či graf s doprovodným textem.
+
+\paragraph{Fáze projektu:}
+Testování řešení před předáním výsledného systému zákazníkovi.
+
+\end{document}
