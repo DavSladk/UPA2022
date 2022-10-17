@@ -35,27 +35,30 @@
 
 \chapter{Analýza zdrojových dat}
 
-\paragraph{Cíl:}
-Zjistit a popsat, jaké datové sady budou pro úlohu v projektu potřeba a jaké jsou jejich vlastnosti tak,
-abychom mohli zvolit vhodný formát a způsob uložení v NoSQL databázi.
+Použitá datová sada se nachází na stránkách \href{https://mdcr.cz/Dokumenty/Verejna-doprava/Jizdni-rady,-kalendare-pro-jizdni-rady,-metodi-%281%29/Jizdni-rady-verejne-dopravy}{ministerstva dopravy}
+a to konrétně \href{https://portal.cisjr.cz/pub/draha/celostatni/szdc/}{zde}. Detailní popis formátu dokumentů datové sady lze najít na stejném \href{https://portal.cisjr.cz/pub/draha/celostatni/szdc/Popis%20DJ%C5%98_CIS_v1_09.pdf}{místě}.
 
-\paragraph{Obsah:}
-Pro významné použité datové soubory určit nad rámec jejich veřejně přístupné dokumentaci alespoň následující:
-odkud a jak ho lze získat,
-jak často a jakým způsobem je tam aktualizován,
-jaké jsou (jen významné) části jeho struktury (pokud je strukturovaný, tj. elementy/sloupce a jejich datové typy, povinost/volitelnost, opakování, atp.;
-jen dále významné části, pokud pro zbytek lze udělat odkaz do veřejné dokumentace ke zdroji, existuje-li taková),
-jaký je identifikátor položek ve zdroji (pokud existuje) a v jakém kontextu/rozsahu a časovém rozmezí jsou jeho hodnoty jedinečné,
-jaké jsou případné odkazy z položek zdroje na položky dalších zdrojů (pokud tam takové jsou),
-jaké jsou možnosti seskupení položek ze zdroje na základě jejich hodnot (např. zaměstnance můžeme seskupt dle oddělení),
-případné speciální rysy dat ve zdroji (např. temporální či multimediální složky, geografická data, atp.),
-další poznámky důležité pro následný návrh (např. velikost zdroje, jeho chybovost, atp.).
+Datová sada se skládá z \verb|XML| souborů. Tyto soubory jsou zveřejňovaný na začátku roku pro celý rok ve složce \verb|GVD|. Dále je pak každý měsíc zveřejňována datová sada pro daný měsíc s aktualizacemi pro spoje.
+Každý soubor má element \verb|CZPTTCreation|, který určuje jeho vytvoření.
 
-\paragraph{Prostředky:}
-Stručný strukturovaný text, odrážky, případně tabulky; případně s odkazy na konkrétní místa do veřejné dokumentace zdroje na Internetu.
+\verb|XML| soubory lze rozdělit do následujících tří skupin:
+\begin{itemize}
+    \item Definující spoj
+    \item Rušící spoj
+    \item Definující náhradní spoj
+\end{itemize}
+Soubory definující spoje mají jako kořenový element \verb|CZPTTCISMEssage|. První důležité informace se nachází v elementu \verb|Identifiers|,
+kde jsou uvedeny identifikátory pro definované spojení a vlak, který ho bude provádět. Dále element \verb|CZPTTHeader| určuje, zda spoj
+přijíždí nebo pokračuje z/do zahraniční stanice. Elementy \verb|CZPTTLocation| obsahují jednotlivé stanice, kterýma vlak projiždí. Zde jsou
+uvedeny i další informace ke stanici. Nejvýznamnější z nich jsou: čas příjezdu/odjezdu, typ aktivity. Po uvedení všech stanic následuje
+element \verb|PlannedCalendar|, který určuje výčet dní, kdy je tento spoj prováděň.
 
-\paragraph{Fáze projektu:}
-Hned na začátku po seznámení se zdroji dat.
+Soubory rušící spoje mají kořenový element \verb|CZCanceledPTTMessage|. Podobně jako soubory definující spoje obsahují identifikaci spoje, který se ruší
+a výčet dní, kdy se ruší. Dále už nenesou žádné informace.
+
+Soubory definující náhradní spoje mají stejnou strukturu jako soubory definující spoje jenom s jediným rozdíle. Obsahují element
+\verb|RelatedPlannedTransportIdentifiers|, který určuje, jaký spoj nahrazují. Tyto spoje mají unikátní indentifikátor vůči
+normálním spojům.
 
 \chapter{Návrh způsobu uložení dat}
 
