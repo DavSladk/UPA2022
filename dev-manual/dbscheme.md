@@ -30,7 +30,7 @@ Datetime
 
 (:File) -[:DEFINES]-> (:PA)
 
-(:PA) -[:CANCELS]-> (:PA)
+(:File) -[:CANCELS]-> (:PA)
 
 (:PA) -[:RELATED]- (:PA) // Pokud spoj nahrazuje jiný
 
