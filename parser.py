@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET, os
 from datetime import datetime, timedelta
 
 # Folder with all xml files
-FOLDER_PATH = "testinputs"
+FOLDER_PATH = "xml_data"
 
 # This function converts start date and bitmapdays
 # To a list of valid dates

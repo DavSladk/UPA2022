@@ -2,6 +2,10 @@
 
 import sys
 
+from yaml import parse
+import parser
+import database
+
 def main():
     print("Application")
     try:
@@ -63,6 +67,9 @@ class App():
     positive = {'yes', 'y', ''}
 
     def __init__(self):
+        self.login = sys.argv[1]
+        self.password = sys.argv[2]
+        self.uri = sys.argv[3]
         self.__initDB__() 
         while True:
             self.parse()
@@ -71,19 +78,49 @@ class App():
 
     def __initDB__(self):
         line = input("Do you want to download data? Y/N\n")
-        if line.casefold() in self.negative:
-            print("Checking local resource . . .")
-            self.check_local_data()
-
-        elif line.casefold() in self.positive:
+        if line.casefold() in self.positive:
             print("Downloading resources . . .")
-            self.download_data()
-
+            self.check_local_data()
+        elif line.casefold() in self.negative:
+            pass
         else:
             print('\nDidn\'t understand "', line,'"')
             print('Please try again')
             self.__initDB__()
+
+        line = input("Do you want to load local data? Y/N\n")
+        if line.casefold() in self.positive:
+            print("Loading local data . . .")
+            self.load_files_to_database()
+            #self.check_local_data()
+        elif line.casefold() in self.negative:
+            pass
+        else:
+            print('\nDidn\'t understand "', line,'"')
+            print('Please try again')
+            self.__initDB__()
+        
     
+    def load_files_to_database(self):
+        db = database.Database(self.login, self.password, self.uri)
+        for parsed in parser.parsed_data_generator():
+            db.merge_file(parsed["filename"],parsed["creation"])
+
+            successor = db.has_file_successor(parsed["filename"])            
+            if len(successor) == 0:
+                pass
+            else:
+                db.connect_file_to_succesor(parsed["filename"], successor[0])
+
+            predeseccor = db.has_file_predecessor(parsed["filename"])
+            if len(predeseccor) == 0:
+                pass
+            else:
+                db.connect_file_to_predecessor(parsed["filename"], predeseccor[0])
+                db.remove_predecessor_connections(parsed["filename"], predeseccor[0])
+
+        db.close()
+
 
     def parse(self):
         query = Query()
