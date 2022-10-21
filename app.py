@@ -92,7 +92,7 @@ class App():
         if line.casefold() in self.positive:
             print("Loading local data . . .")
             self.load_files_to_database()
-            #self.check_local_data()
+            self.process_files()
         elif line.casefold() in self.negative:
             pass
         else:
@@ -100,10 +100,22 @@ class App():
             print('Please try again')
             self.__initDB__()
         
-    
+    def process_files(self):
+        db = database.Database(self.login, self.password, self.uri)
+        for file in db.get_unprocessed_files():
+            # print(file)
+            parsed = parser.parse_file("xml_data/"+file)
+            if parsed["type"] == "normal":
+                db.merge_PA_TR(parsed["ids"][0], parsed["ids"][1], parsed["filename"])
+                if parsed["related"] is not None:
+                    db.merge_related_PA(parsed["ids"][0], parsed["related"])
+                # db.merge_stations()
+                # db.merge_days()
+        db.close()
+
     def load_files_to_database(self):
         db = database.Database(self.login, self.password, self.uri)
-        for parsed in parser.parsed_data_generator():
+        for parsed in parser.parsed_data_generator_reduced():
             db.merge_file(parsed["filename"],parsed["creation"])
 
             successor = db.has_file_successor(parsed["filename"])            
