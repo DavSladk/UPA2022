@@ -51,6 +51,23 @@ def parsed_data_generator():
     for file in xml_file_generator():
         yield parse_file(file)
 
+def parsed_data_generator_reduced():
+    for file in xml_file_generator():
+        yield parse_file_reduced(file)
+
+def parse_file_reduced(file):
+    tree = ET.parse(file)
+    root = tree.getroot()
+    DT = {}
+    DT["filename"] = os.path.basename(file)
+    DT["type"] = "cancel" if "cancel" in DT["filename"] else "normal"
+    if DT["type"] == "cancel":
+        DT["creation"] = root.find(".//CZPTTCancelation").text
+    else:
+        DT["creation"] = root.find(".//CZPTTCreation").text
+    return DT
+
+
 # Parses single file from arguments, returns a dict of parsed data
 def parse_file(file):
     # XML tree
@@ -78,7 +95,7 @@ def parse_file(file):
     # In cancelation file no more data is found
     if DT["type"] == "cancel":
         # Time of cancelation
-        DT["canceled"] = root.find(".//CZPTTCancelation").text
+        DT["creation"] = root.find(".//CZPTTCancelation").text
         return DT
 
     # List of train stop info (0ty prvek je vychozi stanice, posledni je cilova stanice)
@@ -131,7 +148,7 @@ def main():
             print(f'ids: {parsed["ids"]}')
             print(f'Kalenar: {parsed["calendar"]}\n')
             print(f'Kalendar v listu: {parsed["list_calendar"]}')
-            print(f'Canceled: {parsed["canceled"]}')
+            print(f'Canceled: {parsed["creation"]}')
         print(f"************************************************* {filecount} ***************")
     print(f"Parsed {filecount} files.")
 
