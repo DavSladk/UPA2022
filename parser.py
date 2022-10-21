@@ -86,6 +86,11 @@ def parse_file(file):
     # All identifiers
     DT["ids"] = [node_to_dict(x) for x in root.findall(".//PlannedTransportIdentifiers")]
 
+    DT["related"] = None
+    tmp = root.find(".//RelatedPlannedTransportIdentifiers")
+    if tmp is not None:
+        DT["related"] = node_to_dict(tmp)        
+
     # Raw info about valid days
     DT["calendar"] = node_to_dict(root.find(".//PlannedCalendar"))
 
@@ -137,6 +142,7 @@ def main():
         if parsed["type"] == "normal":
             print(f'filename: {parsed["filename"]}')
             print(f'ids: {parsed["ids"]}')
+            print(f'related: {parsed["related"]}')
             print(f'Vychozi stanice: {parsed["locations"][0]}\n  {parsed["timings"][0]}\n  {parsed["at_loc_info"][0]}\n')
             print(f'Cilova stanice:  {parsed["locations"][-1]}\n  {parsed["timings"][-1]}\n  {parsed["at_loc_info"][-1]}\n')
             print(f'Kalenar: {parsed["calendar"]}\n')
