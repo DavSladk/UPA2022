@@ -103,14 +103,17 @@ class App():
     def process_files(self):
         db = database.Database(self.login, self.password, self.uri)
         for file in db.get_unprocessed_files():
-            # print(file)
             parsed = parser.parse_file("xml_data/"+file)
             if parsed["type"] == "normal":
                 db.merge_PA_TR(parsed["ids"][0], parsed["ids"][1], parsed["filename"])
                 if parsed["related"] is not None:
                     db.merge_related_PA(parsed["ids"][0], parsed["related"])
                 # db.merge_stations()
-                # db.merge_days()
+                db.merge_days(parsed["ids"][0], parsed["list_calendar"])
+            else:
+                db.merge_cancels(parsed["ids"][0], parsed["filename"])
+                db.delete_canceled_days(parsed["ids"][0], parsed["list_calendar"])
+                pass
         db.close()
 
     def load_files_to_database(self):

@@ -161,6 +161,46 @@ class Database:
         )
         tx.run(query, corePA=PA["Core"], coreRelatedPA=relatedPA["Core"])
 
+    def merge_cancels(self, PA, filename):
+        with self.driver.session() as session:
+            session.execute_write(self._merge_cancels, PA, filename)
+
+    @staticmethod
+    def _merge_cancels(tx, PA, filename):
+        query = (
+            "MATCH (f:File {filename:$filename}) "
+            "MATCH (p:PA {core:$core}) "
+            "MERGE (f)-[:CANCELS]->(p) "
+        )
+        tx.run(query, filename=filename, core=PA["Core"])
+    
+    def merge_days(self, PA, calendarList):
+        with self.driver.session() as session:
+            for day in calendarList:
+                session.execute_write(self._merge_days, PA, day)
+
+    @staticmethod
+    def _merge_days(tx, PA, day):
+        query = (
+            "MERGE (p:PA {core:$core}) "
+            "MERGE (d:Day {date:$day}) "
+            "MERGE (p)-[:GOES_IN]->(d) "
+        )
+        tx.run(query, day=day, core=PA["Core"])
+    
+    def delete_canceled_days(self, PA, calendarList):
+        with self.driver.session() as session:
+            for day in calendarList:
+                session.execute_write(self._delete_canceled_days, PA, day)
+
+    @staticmethod
+    def _delete_canceled_days(tx, PA, day):
+        query = (
+            "MATCH (p:PA {core:$core}) -[g:GOES_IN]-> (d:Day {date:$day}) "
+            "DELETE g "
+        )
+        tx.run(query, day=day, core=PA["Core"])
+
 if __name__ == "__main__":
     Database.enable_log(logging.INFO, sys.stdout)
     db = Database(login, password, uri)
