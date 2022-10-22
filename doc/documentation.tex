@@ -5,6 +5,7 @@
 \usepackage[czech]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 
 \usepackage{csquotes}% correct/formal language-specific quotations
 \usepackage{microtype}% character protrusion, font expansion, adjustment of interword spacing, additional kerning, tracking, etc.
@@ -100,7 +101,7 @@ Zakončování návrhu a přechod k implementaci.
 \part{Návrh, implemetace a použití aplikace}
 
 \chapter{Návrh aplikace}
-
+\iffalse
 \paragraph{Cíl:}
 Navrhnout hlavní části aplikace splňující požadavky zadání s důrazem na práci s na ni napojenou databází NoSQL či datovými zdroji
 (při jejich předzpracování a nahrávání do NoSQL databáze).
@@ -116,6 +117,27 @@ Důraz je kladen na způsob realizace dotazů ze zadání.
 
 \paragraph{Fáze projektu:}
 Návrh aplikace a částečně po či souběžně s návrhem databáze.
+\fi
+\section{Zpracování souborů XML}
+
+Informace o vlakových spojích jsou získávány ze souborů ve formátu XML. Tyto soubory je třeba zpracovat – nahrát data do strukturované vnitřní reprezentace programu, pro efektivní nahrávání do databáze. Každý soubor obsahuje informace o jednom konkrétním vlakovém spoji, jeho cesta a časy ve stanicích jsou vždy stejné, jsou zde definované dny, ve kterých tento spoj jede. Nejdůležitější zpracovávaná data jsou:
+
+\begin{itemize}
+    \item Identifikátory
+    \item Navštívené stanice a časy příjezdu a odjezdu
+    \item Dny, ve kterých spoj jede
+\end{itemize}
+
+\subsection{Struktura XML souborů}
+Každá s těchto informací se nachází ve vlastní „větvi“ v souboru. Nachází se u nich samozřejmě i dodatečné informace – detaily lokace, činnost vlaku ve stanici atd. Platné dny jsou určeny pomocí dvou atributů – začátek a konec platnosti a bitmapa. Bitmapou je myšlen řetězec jedniček a nul, kde jedničky vyjadřují platnost v jednotlivých dnech. Tímto způsobem lze vyjádřit platné dny na rok dopředu pomocí řetězce dlouhém 365 znaků.
+
+\subsection{Zvolené Prostředky}
+Zpracovávání souborů je implementováno v jazyce Python v souboru \verb|parser.py|. Je využito modulu \verb|xml|, který je součástí základní instalace Pythonu, není třeba jej dodatečně instalovat. Tento modul obsahuje třídu \verb|ElementTree|, která umožňuje snadné nahrávání dat ze stromové struktury souboru. Velmi užitečnou funkcí je možnost adresování uzlů pomocí „cesty“ - obdobným způsobem jako adresování souborů v souborovém systému.
+
+\subsection{Způsob implementace}
+Nejdůležitější roli při zpracovávání hraje funkce \verb|node_to_dict|, která rekurzivně prohledává daný uzel a převádí jeho obsah na slovníkový datový typ.
+
+Protože platné dny jsou v naší databázi ukládány jako vlastní uzly, na které pak odkazují spoje, které jsou platné v daný den, je potřeba původní reprezentaci platných dní (popsána výše) převést na seznam konkrétních kalendářních dat. Pro implementaci této funkcionality byl využit modul \verb|datetime|, který je opět součástí základní instalace pythonu. Tento modul mimo jiné umožňuje vykonávat „aritmetické operace“ s kalendářními daty. V našem případě se jedná o sečtení data začátku platnosti a indexu jedničky v příslušné bitmapě. Implementace je ve funkci \verb|cal_to_listofdays|.
 
 \chapter{Způsob použití}
 
@@ -147,5 +169,8 @@ Strukturvaný text, případně tabulka či graf s doprovodným textem.
 
 \paragraph{Fáze projektu:}
 Testování řešení před předáním výsledného systému zákazníkovi.
+
+\section{Rychlost zpracování XML souborů}
+Funkčnost a efektivita skriptu \verb|parser.py| byla testována nad složkou \verb|GVD2022|, která obsahuje přibližně 12300 souborů formátu XML. Všechny soubory byly v experimentu zpracovány a výpis důležitých informací vytisknut na standardní výstup. Tato operace trvala 93 sekund, tedy cca 132 zpracovaných souborů za sekundu.
 
 \end{document}
