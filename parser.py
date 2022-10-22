@@ -136,52 +136,51 @@ def parse_file(file):
 
 def fill_up_missing_location_info(location):
     if not "CountryCodeISO" in location:
-        location["CountryCodeISO"] = "null"
+        location["CountryCodeISO"] = None
 
     if not "LocationPrimaryCode" in location:
-        location["LocationPrimaryCode"] = "null"
+        location["LocationPrimaryCode"] = None
     
     if not "PrimaryLocationName" in location:
-        location["PrimaryLocationName"] = "null"
+        location["PrimaryLocationName"] = None
     
     if not "LocationSubsidiaryIdentification" in location:
         location["LocationSubsidiaryIdentification"] = {}
     
     if not "LocationSubsidiaryCode" in location["LocationSubsidiaryIdentification"]:
-        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryCode"] = "null"
+        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryCode"] = None
     
-    if not "LocationSubsidiaryTypeCode" in location["LocationSubsidiaryIdentification"]:
-        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryTypeCode"] = "null"
+    # if not "LocationSubsidiaryTypeCode" in location["LocationSubsidiaryIdentification"]:
+    #     location["LocationSubsidiaryIdentification"]["LocationSubsidiaryTypeCode"] = "null"
     
     if not "AllocationCompany" in location["LocationSubsidiaryIdentification"]:
-        location["LocationSubsidiaryIdentification"]["AllocationCompany"] = "null"
+        location["LocationSubsidiaryIdentification"]["AllocationCompany"] = None
     
     if not "LocationSubsidiaryName" in location["LocationSubsidiaryIdentification"]:
-        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryName"] = "null"
+        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryName"] = None
 
 def fill_up_missing_timing_info(timing):
     if type(timing["Timing"]) is dict:
-        timing["Timing"] = [{"Time": timing["Timing"]["Time"], "Offset": timing["Timing"]["Offset"]},{"Time": "null", "Offset": "null"}]
-        pass
-    
+        timing["Timing"] = [{"Time": timing["Timing"]["Time"], "Offset": timing["Timing"]["Offset"]},{"Time": None, "Offset": None}]
+
     if not "DwellTime" in timing:
-        timing["DwellTime"] = "null"
+        timing["DwellTime"] = None
 
 def fill_up_missing_at_loc_info(loc):
     if not "ResponsibleRU" in loc:
-        loc["ResponsibleRU"] = "null"
+        loc["ResponsibleRU"] = None
 
     if not "ResponsibleIM" in loc:
-        loc["ResponsibleIM"] = "null"
+        loc["ResponsibleIM"] = None
 
     if not "TrainType" in loc:
-        loc["TrainType"] = "null"
+        loc["TrainType"] = None
     
     if not "TrafficType" in loc:
-        loc["TrafficType"] = "null"
+        loc["TrafficType"] = None
     
     if not "OperationalTrainNumber" in loc:
-        loc["OperationalTrainNumber"] = "null"
+        loc["OperationalTrainNumber"] = None
     
     if not "TrainActivity" in loc:
         loc["TrainActivityType"] = []

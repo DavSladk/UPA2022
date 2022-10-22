@@ -28,7 +28,7 @@ class Database:
     @staticmethod
     def _merge_file(tx, filename, created):
         query = (
-            "MERGE (f:File {filename: $filename, created: $created}) "
+            "MERGE (f:File {Filename: $filename, Created: $created}) "
         )
         tx.run(query, filename=filename, created=created)
 
@@ -42,12 +42,12 @@ class Database:
         query = (
             "MATCH (f:File) "
             "MATCH (ff:File) "
-            "WHERE f.filename=$filename AND datetime(f.created) < datetime(ff.created) AND NOT exists((f)-[:PRECEEDS]->()) "
-            "RETURN ff.filename "
-            "ORDER BY ff.created "
+            "WHERE f.Filename=$filename AND datetime(f.Created) < datetime(ff.Created) AND NOT exists((f)-[:PRECEEDS]->()) "
+            "RETURN ff.Filename "
+            "ORDER BY ff.Created "
         )
         result = tx.run(query, filename=filename)
-        return result.value("ff.filename")
+        return result.value("ff.Filename")
     
     def connect_file_to_succesor(self, filename, filename_succ):
         with self.driver.session() as session:
@@ -59,7 +59,7 @@ class Database:
         query = (
             "MATCH (f:File) "
             "MATCH (ff:File) "
-            "WHERE f.filename=$filename AND ff.filename=$filename_succ "
+            "WHERE f.Filename=$filename AND ff.Filename=$filename_succ "
             "MERGE (f)-[:PRECEEDS]->(ff) "
         )
         tx.run(query, filename=filename, filename_succ=filename_succ)
@@ -74,12 +74,12 @@ class Database:
         query = (
             "MATCH (f:File) "
             "MATCH (ff:File) "
-            "WHERE f.filename=$filename AND datetime(f.created) > datetime(ff.created) AND NOT exists((f)<-[:PRECEEDS]-()) "
-            "RETURN ff.filename "
-            "ORDER BY ff.created DESC"
+            "WHERE f.Filename=$filename AND datetime(f.Created) > datetime(ff.Created) AND NOT exists((f)<-[:PRECEEDS]-()) "
+            "RETURN ff.Filename "
+            "ORDER BY ff.Created DESC"
         )
         result = tx.run(query, filename=filename)
-        return result.value("ff.filename")
+        return result.value("ff.Filename")
 
     def connect_file_to_predecessor(self, filename, filename_pred):
         with self.driver.session() as session:
@@ -90,7 +90,7 @@ class Database:
         query = (
             "MATCH (f:File) "
             "MATCH (ff:File) "
-            "WHERE f.filename=$filename AND ff.filename=$filename_pred "
+            "WHERE f.Filename=$filename AND ff.Filename=$filename_pred "
             "MERGE (f)<-[:PRECEEDS]-(ff) "
         )
         tx.run(query, filename=filename, filename_pred=filename_pred)
@@ -103,7 +103,7 @@ class Database:
     def _remove_predecessor_connections(tx, filename, filename_pred):
         query = (
             "MATCH (f:File)-[r:PRECEEDS]->(ff:File) "
-            "WHERE f.filename=$filename_pred AND NOT ff.filename=$filename "
+            "WHERE f.Filename=$filename_pred AND NOT ff.Filename=$filename "
             "DELETE r"
         )
         tx.run(query, filename=filename, filename_pred=filename_pred)
@@ -119,11 +119,11 @@ class Database:
         query = (
             "MATCH (f:File) "
             "WHERE NOT EXISTS ( (f)-[:DEFINES]->() ) "
-            "RETURN f.filename AS filename "
-            "ORDER BY f.created "
+            "RETURN f.Filename AS Filename "
+            "ORDER BY f.Created "
         )
         result = tx.run(query)
-        return [row["filename"] for row in result]
+        return [row["Filename"] for row in result]
 
     def merge_PA_TR(self, PA, TR, filename):
         with self.driver.session() as session:
@@ -132,12 +132,12 @@ class Database:
     @staticmethod
     def _merge_PA_TR(tx, PA, TR, filename):
         queryA = (
-            "MERGE (f:File {filename:$filename}) "
-            "MERGE (p:PA {core:$corePA}) "
-            "MERGE (t:TR {core:$coreTR}) "
+            "MERGE (f:File {Filename:$filename}) "
+            "MERGE (p:PA {Core:$corePA}) "
+            "MERGE (t:TR {Core:$coreTR}) "
             "MERGE (f)-[:DEFINES]->(p)-[:SERVED_BY]->(t) "
-            "SET p.company=$companyPA, p.variant=$variantPA, p.timetableyear=$yearPA, "
-            "    t.company=$companyTR, t.variant=$variantTR, t.timetableyear=$yearTR "
+            "SET p.Company=$companyPA, p.Variant=$variantPA, p.TimetableYear=$yearPA, "
+            "    t.Company=$companyTR, t.Variant=$variantTR, t.TimetableYear=$yearTR "
         )
         # queryB = (
         #     "MATCH (p:PA {core:$corePA}) "
@@ -155,8 +155,8 @@ class Database:
     @staticmethod
     def _merge_related_PA(tx, PA, relatedPA):
         query = (
-            "MATCH (p:PA {core:$corePA}) "
-            "MATCH (pr:PA {core:$coreRelatedPA}) "
+            "MATCH (p:PA {Core:$corePA}) "
+            "MATCH (pr:PA {Core:$coreRelatedPA}) "
             "MERGE (p)-[:RELATED]->(pr) "
         )
         tx.run(query, corePA=PA["Core"], coreRelatedPA=relatedPA["Core"])
@@ -168,8 +168,8 @@ class Database:
     @staticmethod
     def _merge_cancels(tx, PA, filename):
         query = (
-            "MATCH (f:File {filename:$filename}) "
-            "MATCH (p:PA {core:$core}) "
+            "MATCH (f:File {Filename:$filename}) "
+            "MATCH (p:PA {Core:$core}) "
             "MERGE (f)-[:CANCELS]->(p) "
         )
         tx.run(query, filename=filename, core=PA["Core"])
@@ -182,8 +182,8 @@ class Database:
     @staticmethod
     def _merge_days(tx, PA, day):
         query = (
-            "MERGE (p:PA {core:$core}) "
-            "MERGE (d:Day {date:$day}) "
+            "MERGE (p:PA {Core:$core}) "
+            "MERGE (d:Day {Date:$day}) "
             "MERGE (p)-[:GOES_IN]->(d) "
         )
         tx.run(query, day=day, core=PA["Core"])
@@ -196,10 +196,59 @@ class Database:
     @staticmethod
     def _delete_canceled_days(tx, PA, day):
         query = (
-            "MATCH (p:PA {core:$core}) -[g:GOES_IN]-> (d:Day {date:$day}) "
+            "MATCH (p:PA {Core:$core}) -[g:GOES_IN]-> (d:Day {Date:$day}) "
             "DELETE g "
         )
         tx.run(query, day=day, core=PA["Core"])
+    
+    def merge_stations(self, PA, location, timing, info):
+        with self.driver.session() as session:
+            session.execute_write(self._merge_stations, PA,location, timing, info)
+
+    @staticmethod
+    def _merge_stations(tx, PA, location, timing, info):
+        query = (
+            "MERGE (s:Station {LocationPrimaryCode:$LocationPrimaryCode, PrimaryLocationName:$PrimaryLocationName, CountryCodeISO:$CountryCodeISO}) "
+            "MERGE (p:PA {Core:$Core}) "
+            "MERGE (p)-[i:IS_IN]->(s) "
+            "SET "
+            "i.LocationSubsidiaryCode=$LocationSubsidiaryCode, "
+            "i.AllocationCompany=$AllocationCompany, "
+            "i.LocationSubsidiaryName=$LocationSubsidiaryName, "
+            "i.ALA=$ALA, "
+            "i.ALAoffset=$ALAoffset, "
+            "i.ALD=$ALD, "
+            "i.ALDoffset=$ALDoffset, "
+            "i.DwellTime=$DwellTime, "
+            "i.ResponsibleRU=$ResponsibleRU, "
+            "i.ResponsibleIM=$ResponsibleIM, "
+            "i.TrainType=$TrainType, "
+            "i.TrafficType=$TrafficType, "
+            "i.OperationalTrainNumber=$OperationalTrainNumber, "
+            "i.TrainActivityType=$TrainActivityType "
+            # "i.NetworkSpecificParameter=$NetworkSpecificParameter "
+        )
+        tx.run(query,
+            LocationPrimaryCode=location["LocationPrimaryCode"],
+            PrimaryLocationName=location["PrimaryLocationName"],
+            CountryCodeISO=location["CountryCodeISO"],
+            Core=PA["Core"],
+            LocationSubsidiaryCode= location["LocationSubsidiaryIdentification"]["LocationSubsidiaryCode"],
+            AllocationCompany=location["LocationSubsidiaryIdentification"]["AllocationCompany"],
+            LocationSubsidiaryName=location["LocationSubsidiaryIdentification"]["LocationSubsidiaryName"],
+            ALA=timing["Timing"][0]["Time"],
+            ALAoffset=timing["Timing"][0]["Offset"],
+            ALD=timing["Timing"][1]["Time"],
+            ALDoffset=timing["Timing"][1]["Offset"],
+            DwellTime=timing["DwellTime"],
+            ResponsibleRU=info["ResponsibleRU"],
+            ResponsibleIM=info["ResponsibleIM"],
+            TrainType=info["TrainType"],
+            TrafficType=info["TrafficType"],
+            OperationalTrainNumber=info["OperationalTrainNumber"],
+            TrainActivityType=info["TrainActivityType"]
+            # NetworkSpecificParameter=info["NetworkSpecificParameter"]
+        )
 
 if __name__ == "__main__":
     Database.enable_log(logging.INFO, sys.stdout)
