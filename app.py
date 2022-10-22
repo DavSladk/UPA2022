@@ -108,7 +108,10 @@ class App():
                 db.merge_PA_TR(parsed["ids"][0], parsed["ids"][1], parsed["filename"])
                 if parsed["related"] is not None:
                     db.merge_related_PA(parsed["ids"][0], parsed["related"])
-                # db.merge_stations()
+                
+                for location,timing,info in zip(parsed["locations"], parsed["timings"], parsed["at_loc_info"]):
+                    db.merge_stations(parsed["ids"][0], location, timing, info)
+                
                 db.merge_days(parsed["ids"][0], parsed["list_calendar"])
             else:
                 db.merge_cancels(parsed["ids"][0], parsed["filename"])

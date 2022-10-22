@@ -126,13 +126,73 @@ def parse_file(file):
     # Parsing
     for location in root.findall(".//Location"):
         DT["locations"].append(node_to_dict(location))
+        fill_up_missing_location_info(DT["locations"][-1])
     for timing in root.findall(".//TimingAtLocation"):
         DT["timings"].append(node_to_dict(timing))
+        fill_up_missing_timing_info(DT["timings"][-1])
     for network in root.findall("./NetworkSpecificParameter"):
         DT["network"].append(node_to_dict(network))
     for info in root.findall(".//CZPTTLocation"):
         DT["at_loc_info"].append(node_to_dict(info, ["Location", "TimingAtLocation"]))
+        fill_up_missing_at_loc_info(DT["at_loc_info"][-1])
     return DT
+
+def fill_up_missing_location_info(location):
+    if not "CountryCodeISO" in location:
+        location["CountryCodeISO"] = None
+
+    if not "LocationPrimaryCode" in location:
+        location["LocationPrimaryCode"] = None
+    
+    if not "PrimaryLocationName" in location:
+        location["PrimaryLocationName"] = None
+    
+    if not "LocationSubsidiaryIdentification" in location:
+        location["LocationSubsidiaryIdentification"] = {}
+    
+    if not "LocationSubsidiaryCode" in location["LocationSubsidiaryIdentification"]:
+        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryCode"] = None
+    
+    # if not "LocationSubsidiaryTypeCode" in location["LocationSubsidiaryIdentification"]:
+    #     location["LocationSubsidiaryIdentification"]["LocationSubsidiaryTypeCode"] = "null"
+    
+    if not "AllocationCompany" in location["LocationSubsidiaryIdentification"]:
+        location["LocationSubsidiaryIdentification"]["AllocationCompany"] = None
+    
+    if not "LocationSubsidiaryName" in location["LocationSubsidiaryIdentification"]:
+        location["LocationSubsidiaryIdentification"]["LocationSubsidiaryName"] = None
+
+def fill_up_missing_timing_info(timing):
+    if type(timing["Timing"]) is dict:
+        timing["Timing"] = [{"Time": timing["Timing"]["Time"], "Offset": timing["Timing"]["Offset"]},{"Time": None, "Offset": None}]
+
+    if not "DwellTime" in timing:
+        timing["DwellTime"] = None
+
+def fill_up_missing_at_loc_info(loc):
+    if not "ResponsibleRU" in loc:
+        loc["ResponsibleRU"] = None
+
+    if not "ResponsibleIM" in loc:
+        loc["ResponsibleIM"] = None
+
+    if not "TrainType" in loc:
+        loc["TrainType"] = None
+    
+    if not "TrafficType" in loc:
+        loc["TrafficType"] = None
+    
+    if not "OperationalTrainNumber" in loc:
+        loc["OperationalTrainNumber"] = None
+    
+    if not "TrainActivity" in loc:
+        loc["TrainActivityType"] = []
+    elif type(loc["TrainActivity"]) is dict:
+        loc["TrainActivityType"] = [loc["TrainActivity"]["TrainActivityType"]]
+    else:
+        loc["TrainActivityType"] = []
+        for e in loc["TrainActivity"]:
+            loc["TrainActivityType"].append(e["TrainActivityType"])        
 
 # Tohle je demo ktere ukazuje jak vypadaji zparsovana data ve vnitrni
 # reprezentaci pythonu.
