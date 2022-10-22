@@ -120,6 +120,9 @@ def parse_file(file):
     # Additional info at each location (0ty prvek je vychozi stanice, posledni je cilova stanice)
     DT["at_loc_info"] = []
 
+    # Info about locations from foregin countries. Is None if not applicable
+    DT["header"] = node_to_dict(root.find(".//CZPTTHeader"))
+
     # Parsing
     for location in root.findall(".//Location"):
         DT["locations"].append(node_to_dict(location))
@@ -141,6 +144,7 @@ def main():
         filecount += 1
         if parsed["type"] == "normal":
             print(f'filename: {parsed["filename"]}')
+            print(f'Header: {parsed["header"]}')
             print(f'ids: {parsed["ids"]}')
             print(f'related: {parsed["related"]}')
             print(f'Vychozi stanice: {parsed["locations"][0]}\n  {parsed["timings"][0]}\n  {parsed["at_loc_info"][0]}\n')
