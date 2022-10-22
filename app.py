@@ -5,6 +5,7 @@ import sys
 from yaml import parse
 import parser
 import database
+import time
 
 def main():
     print("Application")
@@ -57,18 +58,23 @@ class Query():
     
     def search_connection(self, init_station, terminal_station, init_date_time):
         date = init_date_time.split('T')[0]
-        time = init_date_time.split('T')[1]+".0+01:00"
-        db = database.Database(self.login, self.password, self.uri)        
-        result = db.get_connection(init_station, terminal_station, date, time)
+        init_time = init_date_time.split('T')[1]+".0+01:00"
+        db = database.Database(self.login, self.password, self.uri)
+        start_time = time.time()    
+        result = db.get_connection(init_station, terminal_station, date, init_time)
+        end_time = time.time()
         db.close()
-        return result
+        total_time = end_time - start_time
+        return result, total_time
 
-    def print_result(self, result):
+    def print_result(self, result, total_time):
         print('---------------------------------------')
         if len(result) == 0:
             print("No connection found.")        
         for station in result:
             print(f'{station["location"]} -- {station["time"]}')
+        print('---------------------------------------')
+        print(f'It took {total_time}s to complete this query.')
         print('---------------------------------------')
 
     def __init__(self, login, password, uri):
@@ -78,8 +84,8 @@ class Query():
         self.load_initial_station()
         self.load_terminal_station()
         self.load_since_date()
-        result = self.search_connection(self.init_station, self.terminal_station, self.init_date_time)
-        self.print_result(result)
+        result, total_time = self.search_connection(self.init_station, self.terminal_station, self.init_date_time)
+        self.print_result(result, total_time)
 
 
 class App():
@@ -111,8 +117,11 @@ class App():
         line = input("Do you want to load local data? Y/N\n")
         if line.casefold() in self.positive:
             print("Loading local data . . .")
+            start_time = time.time()
             self.load_files_to_database()
             self.process_files()
+            end_time = time.time()
+            print(f'Time to init the database: {end_time-start_time} s')
         elif line.casefold() in self.negative:
             pass
         else:
