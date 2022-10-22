@@ -23,7 +23,7 @@ class Database:
     
     def merge_file(self, filename, created):
         with self.driver.session() as session:
-            session.execute_read(self._merge_file, filename, created)
+            session.execute_write(self._merge_file, filename, created)
 
     @staticmethod
     def _merge_file(tx, filename, created):
@@ -249,6 +249,45 @@ class Database:
             TrainActivityType=info["TrainActivityType"]
             # NetworkSpecificParameter=info["NetworkSpecificParameter"]
         )
+    
+    def get_connection(self, init_station, terminal_station, date, time):
+        with self.driver.session() as session:
+            return session.execute_read(self._get_connection, init_station, terminal_station, date, time)
+
+    @staticmethod
+    def _get_connection(tx, init_station, terminal_station, date, time):
+        query = (
+            "MATCH (s:Station)<-[i:IS_IN]-(p:PA)-[ii:IS_IN]->(ss:Station) "
+            "MATCH (p)-[:GOES_IN]->(d:Day) "
+            "MATCH (sx:Station)<-[ix:IS_IN]-(p)-[ii:IS_IN]->(ss:Station) "
+            "WHERE s.PrimaryLocationName=$station1 "
+            "AND   ss.PrimaryLocationName=$station2 "
+            "AND   time(i.ALA) > time($time) "
+            "AND   time(ii.ALA) > time(i.ALA) "
+            "AND   d.Date=$date "
+            "AND   time(ix.ALA) > time(i.ALA) "
+            "AND   time(ix.ALA) < time(ii.ALA) "
+            "AND   time(ix.ALA) < time(ii.ALA) "
+            "AND   '0001' IN i.TrainActivityType AND i.TrainType='1' "
+            "AND   '0001' IN ii.TrainActivityType AND ii.TrainType='1' "
+            "RETURN s.PrimaryLocationName, i.ALA, sx.PrimaryLocationName, ix.ALA, ss.PrimaryLocationName, ii.ALA " 
+        )
+        result = tx.run(query, station1=init_station, station2=terminal_station, time=time, date=date)
+        to_return = []
+        start = {}
+        end = {}
+        for row in result:
+            start = {"location":row["s.PrimaryLocationName"], "time":row["i.ALA"].split('.')[0]}
+            to_return.append({"location":row["sx.PrimaryLocationName"], "time":row["ix.ALA"].split('.')[0]})
+            end = {"location":row["ss.PrimaryLocationName"], "time":row["ii.ALA"].split('.')[0]}
+        
+        if len(to_return) == 0:
+            return to_return
+
+        to_return.append(end)
+        to_return = [start] + to_return
+
+        return to_return
 
 if __name__ == "__main__":
     Database.enable_log(logging.INFO, sys.stdout)

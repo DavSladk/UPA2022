@@ -55,11 +55,31 @@ class Query():
     def get_to_date(self):
         return self.terminal_date_time
     
-    def __init__(self):
+    def search_connection(self, init_station, terminal_station, init_date_time):
+        date = init_date_time.split('T')[0]
+        time = init_date_time.split('T')[1]+".0+01:00"
+        db = database.Database(self.login, self.password, self.uri)        
+        result = db.get_connection(init_station, terminal_station, date, time)
+        db.close()
+        return result
+
+    def print_result(self, result):
+        print('---------------------------------------')
+        if len(result) == 0:
+            print("No connection found.")        
+        for station in result:
+            print(f'{station["location"]} -- {station["time"]}')
+        print('---------------------------------------')
+
+    def __init__(self, login, password, uri):
+        self.login=login
+        self.password=password
+        self.uri=uri
         self.load_initial_station()
         self.load_terminal_station()
         self.load_since_date()
-        self.load_to_date()
+        result = self.search_connection(self.init_station, self.terminal_station, self.init_date_time)
+        self.print_result(result)
 
 
 class App():
@@ -73,7 +93,7 @@ class App():
         self.__initDB__() 
         while True:
             self.parse()
-            self.confirmCont()
+            self.confirm_cont()
 
 
     def __initDB__(self):
@@ -141,7 +161,8 @@ class App():
 
 
     def parse(self):
-        query = Query()
+        Query(self.login, self.password, self.uri)
+
 
 
     def download_data(self):
