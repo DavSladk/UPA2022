@@ -125,28 +125,32 @@ class Database:
         result = tx.run(query)
         return [row["Filename"] for row in result]
 
-    def merge_PA_TR(self, PA, TR, filename):
+    def merge_PA_TR(self, PA, TR, filename, network):
         with self.driver.session() as session:
-            session.execute_write(self._merge_PA_TR, PA, TR, filename)
+            session.execute_write(self._merge_PA_TR, PA, TR, filename, network)
 
     @staticmethod
-    def _merge_PA_TR(tx, PA, TR, filename):
+    def _merge_PA_TR(tx, PA, TR, filename, network):
         queryA = (
             "MERGE (f:File {Filename:$filename}) "
             "MERGE (p:PA {Core:$corePA}) "
             "MERGE (t:TR {Core:$coreTR}) "
             "MERGE (f)-[:DEFINES]->(p)-[:SERVED_BY]->(t) "
             "SET p.Company=$companyPA, p.Variant=$variantPA, p.TimetableYear=$yearPA, "
-            "    t.Company=$companyTR, t.Variant=$variantTR, t.TimetableYear=$yearTR "
+            "    t.Company=$companyTR, t.Variant=$variantTR, t.TimetableYear=$yearTR, "
+            "    p.Network=$network "
         )
-        # queryB = (
-        #     "MATCH (p:PA {core:$corePA}) "
-        #     "MATCH (t:TR {core:$coreTR}) "
-        #     "SET p.company=$companyPA, p.variant=$variantPA, p.timetableyear=$yearPA, "
-        #     "    t.company=$companyTR, t.variant=$variantTR, t.timetableyear=$yearTR "
-        # )
-        tx.run(queryA, corePA=PA["Core"], companyPA=PA["Company"], variantPA=PA["Variant"], yearPA=PA["TimetableYear"], coreTR=TR["Core"],  companyTR=TR["Company"], variantTR=TR["Variant"], yearTR=TR["TimetableYear"], filename = filename)
-        # tx.run(queryB, corePA=PA["Core"], companyPA=PA["Company"], variantPA=PA["Variant"], yearPA=PA["TimetableYear"], coreTR=TR["Core"], companyTR=TR["Company"], variantTR=TR["Variant"], yearTR=TR["TimetableYear"])
+        tx.run(queryA,
+            corePA=PA["Core"],
+            companyPA=PA["Company"],
+            variantPA=PA["Variant"],
+            yearPA=PA["TimetableYear"],
+            coreTR=TR["Core"],
+            companyTR=TR["Company"],
+            variantTR=TR["Variant"],
+            yearTR=TR["TimetableYear"],
+            filename = filename,
+            network=str(network))
 
     def merge_related_PA(self, PA, relatedPA):
         with self.driver.session() as session:
@@ -225,8 +229,8 @@ class Database:
             "i.TrainType=$TrainType, "
             "i.TrafficType=$TrafficType, "
             "i.OperationalTrainNumber=$OperationalTrainNumber, "
-            "i.TrainActivityType=$TrainActivityType "
-            # "i.NetworkSpecificParameter=$NetworkSpecificParameter "
+            "i.TrainActivityType=$TrainActivityType, "
+            "i.Network=$Network"
         )
         tx.run(query,
             LocationPrimaryCode=location["LocationPrimaryCode"],
@@ -246,8 +250,8 @@ class Database:
             TrainType=info["TrainType"],
             TrafficType=info["TrafficType"],
             OperationalTrainNumber=info["OperationalTrainNumber"],
-            TrainActivityType=info["TrainActivityType"]
-            # NetworkSpecificParameter=info["NetworkSpecificParameter"]
+            TrainActivityType=info["TrainActivityType"],
+            Network=str(info["NetworkSpecificParameter"])
         )
     
     def get_connection(self, init_station, terminal_station, date, time):
@@ -288,9 +292,3 @@ class Database:
         to_return = [start] + to_return
 
         return to_return
-
-if __name__ == "__main__":
-    Database.enable_log(logging.INFO, sys.stdout)
-    db = Database(login, password, uri)
-    db.merge_file("PA_0054_--KADR299295_01_2022.xml", "2022-10-01T11:40:1")
-    db.close()

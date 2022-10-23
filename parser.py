@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET, os
 from datetime import datetime, timedelta
 
 # Folder with all xml files
-FOLDER_PATH = "xml_data"
+FOLDER_PATH = "xml_data1"
 
 # This function converts start date and bitmapdays
 # To a list of valid dates
@@ -153,14 +153,14 @@ def fill_up_missing_location_info(location):
     if not "LocationSubsidiaryCode" in location["LocationSubsidiaryIdentification"]:
         location["LocationSubsidiaryIdentification"]["LocationSubsidiaryCode"] = None
     
-    # if not "LocationSubsidiaryTypeCode" in location["LocationSubsidiaryIdentification"]:
-    #     location["LocationSubsidiaryIdentification"]["LocationSubsidiaryTypeCode"] = "null"
-    
     if not "AllocationCompany" in location["LocationSubsidiaryIdentification"]:
         location["LocationSubsidiaryIdentification"]["AllocationCompany"] = None
     
     if not "LocationSubsidiaryName" in location["LocationSubsidiaryIdentification"]:
         location["LocationSubsidiaryIdentification"]["LocationSubsidiaryName"] = None
+    
+    if not "network" in location:
+        location["network"] = None
 
 def fill_up_missing_timing_info(timing):
     if type(timing["Timing"]) is dict:
@@ -192,7 +192,10 @@ def fill_up_missing_at_loc_info(loc):
     else:
         loc["TrainActivityType"] = []
         for e in loc["TrainActivity"]:
-            loc["TrainActivityType"].append(e["TrainActivityType"])        
+            loc["TrainActivityType"].append(e["TrainActivityType"])
+    
+    if not "network" in loc:
+        loc["network"] = None
 
 # Tohle je demo ktere ukazuje jak vypadaji zparsovana data ve vnitrni
 # reprezentaci pythonu.
