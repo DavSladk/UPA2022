@@ -299,20 +299,12 @@ U každého spoje je také určeno, v jaké dny jezdí. Tyto dny budou existovat
 \end{figure}
 
 \chapter{Zvolená NoSQL databáze}
-
-\paragraph{Cíl:}
-Rozhrnout a zdůvodnit jaký druh NoSQL databáze je vhodný (zdůvodnění plyne částečně již z předchozího návrhu) a jaký konkrétní produkt NoSQL databáze bude použit.
-
-\paragraph{Obsah:}
-Určit typ databáze a konkrétní produkt NoSQL, vypsat jeho vlastnosti,
-které jsou pro toto řešení užitečné (a jiné než u jiných typů a produktů NoSQL)
-a zdůvodnit jejich vhodnost v kontextu předchozího návrhu.
-
-\paragraph{Prostředky:}
-Stručný volný text (až několik kratších odstavců) s případným vyznačením podstatných části.
-
-\paragraph{Fáze projektu:}
-Zakončování návrhu a přechod k implementaci.
+Pro řešení tohoto problému jsme zvolili grafovou databázi, konkrétně \href{https://neo4j.com/}{Neo4j}. Grafová databáze nám umožní
+reprezentovat entity jako uzly v grafu a vztahu mezi entitaby jako cesty mezi těmito uzly. Zároveň je možné u uzlů i
+cest definovat další vlastnosti typu klíč:hodnota, co zase umožní uložit veškeré další potřebné informace
+vztahující se k jednotlivým objektům. Neo4j poskytuje webové rozhraní pro databázi, které umožňuje jednoduché
+zadávání požadavků na databázi. S kombinací s tím, že toto webové rozhraní také zobrazuje získané výsledky do
+grafu, tak nám to umožní snadnější opravování chyb v aplikaci a snadnější vytváření potřebných požadavků na databázi.
 
 \part{Návrh, implemetace a použití aplikace}
 
