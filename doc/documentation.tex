@@ -62,25 +62,234 @@ Soubory definující náhradní spoje mají stejnou strukturu jako soubory defin
 normálním spojům.
 
 \chapter{Návrh způsobu uložení dat}
+\section{Definice entit a vazeb mezi nimi}
+Z datové sady poskytnuté XML soubory lze definovat několik entit a vazeb mezi nimi vhodných pro uložení do NoSQL databáze.
+\subsection{File}
+Samotné soubory lze považovat za entity pro uložení. Tyto entity ponesou informace o jméně souboru,
+který reprezentují a času, kdy byl soubor vytvořeny z elementu CZPTTCreation.
 
-\paragraph{Cíl:}
-Po posouzení vlastností dat (z předchozí analýzy) a očekávaných dotazů (ze zadání) navrhnout vhodný způsob uložení dat do NoSQL databáze.
-Způsob uložená musí být vhodný z hlediska způsobu nahrávání dat ze zdroje do databáze (a to i průběžného doplňování či aktualizace, bez smazání celé databáze)
-a z hlediska rychlosti dotazování dat v databázi z aplikace s využitím vlastností NoSQL (s využitím klíčů a škálovatelnosti/distribuovanosti databáze).
-Data lze při nahrávání ze zdroje do databáze předzpracovávat, např. kombinovat či doplňovat, odvozovat pomocná data, předpočítávat agregace, atp.
-Takové předzpracování může trvat déle (kritérium vhodnosti při předzpracování v průběhu nahrávání není čas, ale vhodné využití obecných vlastností NoSQL, jako je sharding).
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :File \\
+    \hline
+    filename \\
+    creation \\
+    \hline
+\end{tabular}
 
-\paragraph{Obsah:}
-Pro skupinu či každou podstatnou vlastnost dat z analýzy a dotaz ze zadání (pokud bude mít vliv na návrh) popsat,
-co znamená, jaký problém představuje, jaké je řešení, proč je zvolené řešení dobré a stručně jaké jsou případné alternativy.
+\subsubsection{PRECEDES}
+Novější soubory aktualizují stav definovaný předcházejícími soubory, proto mezi jednotlivými entitami :File
+budou vazby :PRECEDES, které spojí soubor s jeho nejbližším následníkem.
 
-\paragraph{Prostředky:}
-Strukturovaný text (odstavce, sekce, odrážky, atd.), kde je popsán proces získání, předzpracování a uložení dat ze zdroje do databáze.
-Možno použít také pseudokód či diagramy popisující datové toky a použité struktury a vlastnosti NoSQL databází obecně.
-Každé návrhové rozhodnutí musí být řádně zdůvodněno (např. části se strukturou "dotaz/vlastnost", "problém", "řešení", "důvod", "alternativy").
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :File \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :PRECEDES --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :File \\
+    \hline
+\end{tabular}
 
-\paragraph{Fáze projektu:}
-Po analýze dat a analýze uživatelských požadavků na aplikaci, většinou souběžně s návrhem aplikace.
+\subsubsection{DEFINES}
+Pokud se nejedná o soubor rušící spoj, tak tento soubor definuje o jakém spoji podává informace. Tuto vlastnost bude modelována vazbou :DEFINES.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :File \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :DEFINES --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+
+\subsubsection{CANCELS}
+Pokud se jedná o soubor rušící spoj, tak tento soubor definuje jakého spoje ruší jízdy. Tuto vlastnost bude modelována vazbou :CANCELS.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :File \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :CANCELS --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+
+\subsection{PA}
+Další významnou entitou jsou spoje. Tyto spoje budou označovány jako PA -- stejně jako v souborech v elementu Object Type.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+    Core \\
+    Company \\
+    Variant \\
+    TimetableYear \\
+    NetworkSpecificParameters \\
+    \hline
+\end{tabular}
+
+\subsubsection{SERVER BY}
+Každý spoje je prováděn vlakem. Tento vlak je vždy uveden v souboru se spojem, který provádí. Tuto vlastnost
+definujeme jako :SERVED BY.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :SERVED BY --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :TR \\
+    \hline
+\end{tabular}
+
+\subsubsection{RELATED}
+Pokud se jedná o spoj, který nahrazuje jiný spoj, tak je také definováno jaký spoj je nahrazován. Tuto vlastnost
+modelujeme jako :RELATED.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :RELATED --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+
+\subsubsection{GOES IN}
+U každého spoje je také uvedeno, v jaké dny jezdí. Informaci v jaké dny jeden reprezentujeme vazbou :GOES IN mezi spojem a dnem.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :GOES IN --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :Day \\
+    \hline
+\end{tabular}
+
+\subsubsection{IS IN}
+Každý spoj projíždí minimálně dvěmi stanicemi. Tuto vlastnost modelujeme vztahem :IS IN mezi spojem a stanicí.
+Tato vazbna také neve řadu parametrů definující příjez, odjezd, prováděné akce a podobné.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :PA \\
+    \hline
+\end{tabular}
+\begin{tabular}{c}
+    -- :IS IN --> \\
+\end{tabular}
+\begin{tabular}{|l|}
+    \hline
+    :Station \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :IS IN \\
+    \hline
+    LocationSubsidiaryCode \\
+    AllocationCompany \\
+    LocationSubsidiaryName \\
+    ALA \\
+    ALAOffest \\
+    ALD \\
+    ALDOffset \\
+    DwellTime \\
+    ResponsibleRU \\
+    ResponsibleIM \\
+    TrainType \\
+    TrafficType \\
+    CommercialTrafficType \\
+    TrainAvtivityType \\
+    OperationalTrainNumber \\
+    NetworkSpecificParameters \\
+    \hline
+\end{tabular}
+
+\subsection{TR}
+Soubory jsou také definovány vlaky, které provádí spoje. Tyto vlaky budou znázorněny entitami :TR.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :TR \\
+    \hline
+    Core \\
+    Company \\
+    Variant \\
+    TimetableYear \\
+    NetworkSpecificParameters \\
+    \hline
+\end{tabular}
+
+\subsection{Station}
+V XML souborech jsou také definováné stanice, kterými vlak projíždí. Tyto stanice budou modelovány pomocí
+entit :Station.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :Station \\
+    \hline
+    LocationPrimaryNumber \\
+    PrimaryLocationName \\
+    CountryCodeISO \\
+    \hline
+\end{tabular}
+
+\subsection{Day}
+U každého spoje je také určeno, v jaké dny jezdí. Tyto dny budou existovat jeko entity :Day.
+
+\vspace{1em}
+\begin{tabular}{|l|}
+    \hline
+    :Day \\
+    \hline
+    Date \\
+    \hline
+\end{tabular}
 
 \chapter{Zvolená NoSQL databáze}
 
