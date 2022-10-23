@@ -1,8 +1,15 @@
 # UPA2022
-UPA 2022
 
-Coldy - XML
+Hodnocení: ?/8
 
-Arte - terminal parametry
+## Usage
+`python3 app.py login password uri`
 
-Mango - databaze
+* `login`, `password`, `uri` - cretendials to Neo4j database
+
+If you don't want download data, put your own into `xml_data/` folder.
+
+### Project structure
+* `dev-manual` - quick reference
+* `doc` - documentation in pdf and it's source file
+* `*.py` - source files, where `app.py` is the "main"
