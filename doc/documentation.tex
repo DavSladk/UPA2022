@@ -63,9 +63,8 @@ Soubory definující náhradní spoje mají stejnou strukturu jako soubory defin
 normálním spojům.
 
 \chapter{Návrh způsobu uložení dat}
-\section{Definice entit a vazeb mezi nimi}
 Z datové sady poskytnuté XML soubory lze definovat několik entit a vazeb mezi nimi vhodných pro uložení do NoSQL databáze.
-\subsection{File}
+\section{File}
 Samotné soubory lze považovat za entity pro uložení. Tyto entity ponesou informace o jméně souboru,
 který reprezentují a času, kdy byl soubor vytvořeny z elementu CZPTTCreation.
 
@@ -79,7 +78,7 @@ který reprezentují a času, kdy byl soubor vytvořeny z elementu CZPTTCreation
     \hline
 \end{tabular}
 
-\subsubsection{PRECEDES}
+\subsection{PRECEDES}
 Novější soubory aktualizují stav definovaný předcházejícími soubory, proto mezi jednotlivými entitami :File
 budou vazby :PRECEDES, které spojí soubor s jeho nejbližším následníkem.
 
@@ -98,7 +97,7 @@ budou vazby :PRECEDES, které spojí soubor s jeho nejbližším následníkem.
     \hline
 \end{tabular}
 
-\subsubsection{DEFINES}
+\subsection{DEFINES}
 Pokud se nejedná o soubor rušící spoj, tak tento soubor definuje o jakém spoji podává informace. Tuto vlastnost bude modelována vazbou :DEFINES.
 
 \vspace{1em}
@@ -116,7 +115,7 @@ Pokud se nejedná o soubor rušící spoj, tak tento soubor definuje o jakém sp
     \hline
 \end{tabular}
 
-\subsubsection{CANCELS}
+\subsection{CANCELS}
 Pokud se jedná o soubor rušící spoj, tak tento soubor definuje jakého spoje ruší jízdy. Tuto vlastnost bude modelována vazbou :CANCELS.
 
 \vspace{1em}
@@ -134,7 +133,7 @@ Pokud se jedná o soubor rušící spoj, tak tento soubor definuje jakého spoje
     \hline
 \end{tabular}
 
-\subsection{PA}
+\section{PA}
 Další významnou entitou jsou spoje. Tyto spoje budou označovány jako PA -- stejně jako v souborech v elementu Object Type.
 
 \vspace{1em}
@@ -151,7 +150,7 @@ Další významnou entitou jsou spoje. Tyto spoje budou označovány jako PA -- 
     \hline
 \end{tabular}
 
-\subsubsection{SERVER BY}
+\subsection{SERVER BY}
 Každý spoje je prováděn vlakem. Tento vlak je vždy uveden v souboru se spojem, který provádí. Tuto vlastnost
 definujeme jako :SERVED BY.
 
@@ -170,7 +169,7 @@ definujeme jako :SERVED BY.
     \hline
 \end{tabular}
 
-\subsubsection{RELATED}
+\subsection{RELATED}
 Pokud se jedná o spoj, který nahrazuje jiný spoj, tak je také definováno jaký spoj je nahrazován. Tuto vlastnost
 modelujeme jako :RELATED.
 
@@ -189,7 +188,7 @@ modelujeme jako :RELATED.
     \hline
 \end{tabular}
 
-\subsubsection{GOES IN}
+\subsection{GOES IN}
 U každého spoje je také uvedeno, v jaké dny jezdí. Informaci v jaké dny jeden reprezentujeme vazbou :GOES IN mezi spojem a dnem.
 
 \vspace{1em}
@@ -207,7 +206,7 @@ U každého spoje je také uvedeno, v jaké dny jezdí. Informaci v jaké dny je
     \hline
 \end{tabular}
 
-\subsubsection{IS IN}
+\subsection{IS IN}
 Každý spoj projíždí minimálně dvěmi stanicemi. Tuto vlastnost modelujeme vztahem :IS IN mezi spojem a stanicí.
 Tato vazbna také neve řadu parametrů definující příjez, odjezd, prováděné akce a podobné.
 
@@ -250,7 +249,7 @@ Tato vazbna také neve řadu parametrů definující příjez, odjezd, provádě
     \hline
 \end{tabular}
 
-\subsection{TR}
+\section{TR}
 Soubory jsou také definovány vlaky, které provádí spoje. Tyto vlaky budou znázorněny entitami :TR.
 
 \vspace{1em}
@@ -266,7 +265,7 @@ Soubory jsou také definovány vlaky, které provádí spoje. Tyto vlaky budou z
     \hline
 \end{tabular}
 
-\subsection{Station}
+\section{Station}
 V XML souborech jsou také definováné stanice, kterými vlak projíždí. Tyto stanice budou modelovány pomocí
 entit :Station.
 
@@ -281,7 +280,7 @@ entit :Station.
     \hline
 \end{tabular}
 
-\subsection{Day}
+\section{Day}
 U každého spoje je také určeno, v jaké dny jezdí. Tyto dny budou existovat jeko entity :Day.
 
 \vspace{1em}
