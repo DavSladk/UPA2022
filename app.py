@@ -134,7 +134,7 @@ class App():
         for file in db.get_unprocessed_files():
             parsed = parser.parse_file("xml_data/"+file)
             if parsed["type"] == "normal":
-                db.merge_PA_TR(parsed["ids"][0], parsed["ids"][1], parsed["filename"], parsed["network"])
+                db.merge_PA_TR(parsed["ids"][0], parsed["ids"][1], parsed["filename"], parsed["network"], parsed["header"])
                 if parsed["related"] is not None:
                     db.merge_related_PA(parsed["ids"][0], parsed["related"])
                 

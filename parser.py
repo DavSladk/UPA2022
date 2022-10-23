@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET, os
 from datetime import datetime, timedelta
 
 # Folder with all xml files
-FOLDER_PATH = "xml_data1"
+FOLDER_PATH = "xml_data"
 
 # This function converts start date and bitmapdays
 # To a list of valid dates
@@ -210,6 +210,7 @@ def main():
             print(f'Header: {parsed["header"]}')
             print(f'ids: {parsed["ids"]}')
             print(f'related: {parsed["related"]}')
+            print(f'Header: {parsed["header"]}')
             print(f'Vychozi stanice: {parsed["locations"][0]}\n  {parsed["timings"][0]}\n  {parsed["at_loc_info"][0]}\n')
             print(f'Cilova stanice:  {parsed["locations"][-1]}\n  {parsed["timings"][-1]}\n  {parsed["at_loc_info"][-1]}\n')
             print(f'Kalenar: {parsed["calendar"]}\n')

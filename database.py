@@ -125,12 +125,12 @@ class Database:
         result = tx.run(query)
         return [row["Filename"] for row in result]
 
-    def merge_PA_TR(self, PA, TR, filename, network):
+    def merge_PA_TR(self, PA, TR, filename, network, foreign):
         with self.driver.session() as session:
-            session.execute_write(self._merge_PA_TR, PA, TR, filename, network)
+            session.execute_write(self._merge_PA_TR, PA, TR, filename, network, foreign)
 
     @staticmethod
-    def _merge_PA_TR(tx, PA, TR, filename, network):
+    def _merge_PA_TR(tx, PA, TR, filename, network, foreign):
         queryA = (
             "MERGE (f:File {Filename:$filename}) "
             "MERGE (p:PA {Core:$corePA}) "
@@ -138,7 +138,8 @@ class Database:
             "MERGE (f)-[:DEFINES]->(p)-[:SERVED_BY]->(t) "
             "SET p.Company=$companyPA, p.Variant=$variantPA, p.TimetableYear=$yearPA, "
             "    t.Company=$companyTR, t.Variant=$variantTR, t.TimetableYear=$yearTR, "
-            "    p.Network=$network "
+            "    p.Network=$network, "
+            "    p.Foreign=$foreign "
         )
         tx.run(queryA,
             corePA=PA["Core"],
@@ -150,7 +151,9 @@ class Database:
             variantTR=TR["Variant"],
             yearTR=TR["TimetableYear"],
             filename = filename,
-            network=str(network))
+            network=str(network),
+            foreign=str(foreign)
+        )
 
     def merge_related_PA(self, PA, relatedPA):
         with self.driver.session() as session:
