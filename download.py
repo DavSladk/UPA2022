@@ -155,7 +155,7 @@ class DataExtract:
                         # ZIP
                         if zipfile.is_zipfile(root + '/' + filename):
                             unzip = zipfile.ZipFile(root + '/' + filename, 'r', allowZip64=True)
-                            unzip.extract(dest_dir)
+                            unzip.extractall(dest_dir)
                             unzip.close() 
 
                         # GZIP
