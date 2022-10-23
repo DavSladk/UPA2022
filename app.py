@@ -22,9 +22,6 @@ class Query():
     def load_since_date(self):
         self.init_date_time = input("Please put since date:\n")
 
-    def load_to_date(self):
-        self.terminal_date_time = input("Please put to date:\n")
-
     def get_initial_station(self):
         return self.init_station 
 
@@ -163,7 +160,6 @@ class App():
 
 
 def main():
-    print("Application")
     try:
         App()
     except KeyboardInterrupt:

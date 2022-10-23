@@ -349,18 +349,70 @@ Protože platné dny jsou v naší databázi ukládány jako vlastní uzly, na k
 
 \chapter{Způsob použití}
 
-\paragraph{Cíl:}
-Poskytnout stručnou dokumentaci pro zprovoznění databáze a aplikace.
+\section{Neo4j}
 
-\paragraph{Obsah:}
-Stručně popsat, jak celé řešení zprovoznit, tj. nasadit databázi i aplikaci vč. způsobu volání aplikace (příkazový řádek, parametry) pro úlohy
-předzpracování a nahrání dat ze zdroje do databáze a pro ulohy hledání nad databází tak, jak byly definovány v zadání.
+Pro spuštění je potřeba mít přístup k Neo4j databázi. Toho se dá dosáhnout několika způsoby, zde však budou uvedeny
+jenom dva nejpřímočařejší.
 
-\paragraph{Prostředky:}
-Stručný text obsahující návod (popis) s ukázkami způsobu volání aplikace (např. pro skripty by to byl kód příkazového řadku).
+\subsection{Databáze na cloudu}
+Pro tuto variantu je potřeba si založit účet na stránkách \href{https://neo4j.com/}{Neo4j} -> Get Started -> Start Free -> Sign up.
+Po vytvoření účtu je možné se dostat ke správci cloudových databází obdobným způsoběm opět z \href{https://neo4j.com/}{Neo4j} ->
+Get Started -> Start Free -> Přihlášení. Po přihlášení lze vytvořit novou databázi pomocí New Instance. Nezapomeňte si
+poznamenat přihlašovací údaje do databáze.
 
-\paragraph{Fáze projektu:}
-Dokončování implementace, chystání dokumentace pro předání výsledného systému zákazníkovi.
+\subsection{Lokální databáze}
+Pro lokální databázi je třeba stáhnout \href{https://neo4j.com/download-center/#community}{Neo4j Community}.
+Po rozbalení staženého archivu zadejte následující příkaz z kořenového adresáře: \verb|./bin/neo4j console|.
+Databáze bude poskytovat webové rozhraní na http://localhost:7474/. Výchozí login i heslo jsou \verb|neo4j|.
+
+\section{Spuštění}
+\begin{verbatim}
+python3 app.py login heslo uri
+\end{verbatim}
+\begin{itemize}
+    \item \verb|login| - přihlašovací jméno k databázi
+    \item \verb|heslo| - heslo k databázi
+    \item \verb|uri| - uri databáze
+\end{itemize}
+Po spuštení programu se bude program dotazovat na několik informací:
+\begin{enumerate}
+    \item \verb|Do you want to download data? Y/N| - Tato volba způsobí stažení zazipovaných xml do
+    složky zips a jejich následovné rozbalení do složky \verb|xml_data|. Pokud nechcete stahovat data,
+    umístěte vlastní xml soubory do \verb|xml_data|.
+    \item \verb|Do you want to load local data? Y/N| - Projde soubory v \verb|xml_data| a nahraje jejich grafovou
+    reprezentaci do databáze.
+    \item \verb|Please put starting station| - Zadejte výchozí stanici.
+    \item \verb|Please put terminal station| - Zadejte konečnou stanici.
+    \item \verb|Please put since date| - Zadejte čas od kdy má program vyhledávat ve formátu \verb|YYYY-MM-DDTHH:MM:SS|. \verb|T| je oddělovač data a času.
+\end{enumerate}
+Po zadání všech informací program vyhledá nejbližší přímí spoj, pokud takový existuje, mezi stanicemi.
+Posléze budete dotázání, zda chcete provést další vyhledávání.
+
+\vspace{1em}
+Příklad výstupu programu.
+\begin{verbatim}
+user@pc:/path/to/root/folder$ python3 app.py neo4j neo4j bolt://localhost:7687
+Do you want to download data? Y/N
+n
+Do you want to load local data? Y/N
+n
+Please put starting station:
+Polanka nad Odrou
+Please put terminal station:
+Sedlnice
+Please put since date:
+2022-07-13T9:00:00   
+---------------------------------------
+Polanka nad Odrou -- 09:43:00
+Jistebník -- 09:46:00
+Studénka -- 09:51:00
+Sedlnice-Bartošovice -- 09:56:00
+Sedlnice -- 09:57:00
+It took 0.004521846771240234 s to complete this query.
+---------------------------------------
+Do you wish to continue?
+n    
+\end{verbatim}
 
 \chapter{Experimenty}
 
