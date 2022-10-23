@@ -2,7 +2,6 @@
 
 import sys
 
-from yaml import parse
 import parser
 import database
 import time

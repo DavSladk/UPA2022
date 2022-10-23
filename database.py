@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
-import sys
-
 from neo4j import GraphDatabase
-from neo4j.exceptions import ServiceUnavailable
 
 class Database:
     """Class handling neo4j database"""
