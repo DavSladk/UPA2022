@@ -6,25 +6,7 @@ from yaml import parse
 import parser
 import database
 import time
-
-def main():
-    print("Application")
-    try:
-        App()
-    except KeyboardInterrupt:
-        print('\n')
-        sys.exit(0)
-
-
-"""
-TODO:
-    Get data from website
-
-    Search FROM and TO stations in DATE time
-"""
-
-
-""" TODO: date conversions to db format """
+import download
 
 class Query():
     init_station = ''
@@ -106,7 +88,7 @@ class App():
         line = input("Do you want to download data? Y/N\n")
         if line.casefold() in self.positive:
             print("Downloading resources . . .")
-            self.check_local_data()
+            self.download_data()
         elif line.casefold() in self.negative:
             pass
         else:
@@ -172,37 +154,22 @@ class App():
     def parse(self):
         Query(self.login, self.password, self.uri)
 
-
-
-    def download_data(self):
-        if (self.check_local_data()):
-            return
-        else:
-            pass
-        
-    
-    def check_local_data(self):
-        pass
-        return True
-
-
     def confirm_cont(self):
         line = input("Do you wish to continue?\n")
         if line.casefold() in self.negative:
             sys.exit(0)
     
-
-    def load_valid_items(self):
-        pass
-
-    
-    def print_result(self):
-        pass
+    def download_data():
+        download.main()
 
 
-
-
-
+def main():
+    print("Application")
+    try:
+        App()
+    except KeyboardInterrupt:
+        print('\n')
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

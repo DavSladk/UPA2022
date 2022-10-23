@@ -14,7 +14,7 @@ import zipfile
 
 #dl_dir = 'testinputs'
 dl_dir = 'zips/'
-dest_dir = 'testinputs/'
+dest_dir = 'xml_data/'
 url_base = 'https://portal.cisjr.cz'
 url = 'https://portal.cisjr.cz/pub/draha/celostatni/szdc/2022'
 year = '2022/'
