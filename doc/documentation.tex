@@ -11,6 +11,7 @@
 \usepackage{microtype}% character protrusion, font expansion, adjustment of interword spacing, additional kerning, tracking, etc.
 \usepackage{hyperref}% hyper-refs in PDF
 \usepackage{graphicx}
+\usepackage{multirow}
 
 \author{
     František Koleček, \href{mailto:xkolec08@stud.fit.vut.cz}{xkolec08@stud.fit.vut.cz} \\
@@ -280,6 +281,7 @@ entit :Station.
     \hline
 \end{tabular}
 
+\vspace{2em}
 \section{Day}
 U každého spoje je také určeno, v jaké dny jezdí. Tyto dny budou existovat jeko entity :Day.
 
@@ -292,7 +294,7 @@ U každého spoje je také určeno, v jaké dny jezdí. Tyto dny budou existovat
     \hline
 \end{tabular}
 
-\begin{figure}
+\begin{figure}[h]
     \includegraphics[width=1\textwidth, angle=0]{img/structure.pdf}
     \caption{Finální schéma entit a vazeb meiz nimi v databázi.}
 \end{figure}
@@ -341,7 +343,7 @@ Každá s těchto informací se nachází ve vlastní „větvi“ v souboru. Na
 \subsection{Zvolené Prostředky}
 Zpracovávání souborů je implementováno v jazyce Python v souboru \verb|parser.py|. Je využito modulu \verb|xml|, který je součástí základní instalace Pythonu, není třeba jej dodatečně instalovat. Tento modul obsahuje třídu \verb|ElementTree|, která umožňuje snadné nahrávání dat ze stromové struktury souboru. Velmi užitečnou funkcí je možnost adresování uzlů pomocí „cesty“ - obdobným způsobem jako adresování souborů v souborovém systému.
 
-\subsection{Sťahovanie dát}
+\section{Sťahovanie dát}
 Súbory sú stiahnuté prostredníctvom súboru \verb|download.py| v jazyku Python. Bola využitá knihovna \verb|BeautifulSoup4|, ktorá slúži na získavanie dát z HTML súborov. Ďalším podstatným modulom je \verb|requests|, využitý na volanie GET požiadavkov na stiahnutie \verb|zip| súborov. Súbor \verb|download.py| obsahuje dve triedy; \verb|DataDownload| a \verb|DataExtract|. Pomocou prvej triedy sa stiahnu všetky doposiaľ nestiahnuté súbory náležiace danému roku jízdnich radov a uložia sa do priečinku \verb|/zips|. Druhou triedou sú tieto súbory extrahované už v podobe \verb|xml| súborov, pripravených na ďalšie spracovanie.
 
 \subsection{Způsob implementace}
@@ -349,12 +351,34 @@ Nejdůležitější roli při zpracovávání hraje funkce \verb|node_to_dict|, 
 
 Protože platné dny jsou v naší databázi ukládány jako vlastní uzly, na které pak odkazují spoje, které jsou platné v daný den, je potřeba původní reprezentaci platných dní (popsána výše) převést na seznam konkrétních kalendářních dat. Pro implementaci této funkcionality byl využit modul \verb|datetime|, který je opět součástí základní instalace pythonu. Tento modul mimo jiné umožňuje vykonávat „aritmetické operace“ s kalendářními daty. V našem případě se jedná o sečtení data začátku platnosti a indexu jedničky v příslušné bitmapě. Implementace je ve funkci \verb|cal_to_listofdays|.
 
+\section{Práce s databází}
+Obsluhování databáze je implementováno v modulu \verb|database.py|. Obsahem tohoto module je třída \verb|Database| s metodami
+obsahující query na spravování entit (File, PA, TR, Day, Station), tak vazby mezi nimi (PRECEDES, DEFINES, CANCELS, GOES IN, IS IN, RELATED).
+Stěžejní query je však pro vyhledávání spoje:
+\begin{verbatim}
+MATCH (s:Station)<-[i:IS_IN]-(p:PA)-[ii:IS_IN]->(ss:Station)
+MATCH (p)-[:GOES_IN]->(d:Day)
+MATCH (sx:Station)<-[ix:IS_IN]-(p)-[ii:IS_IN]->(ss:Station)
+WHERE s.PrimaryLocationName="Mosty u Jablunkova"
+AND   ss.PrimaryLocationName="Ostrava hl.n."
+AND   time(i.ALA) > time("00:00:00")
+AND   time(ii.ALA) > time(i.ALA)
+AND   d.Date="2022-03-31"
+AND   time(ix.ALA) > time(i.ALA)
+AND   time(ix.ALA) < time(ii.ALA)
+AND   '0001' IN i.TrainActivityType AND i.TrainType='1'
+AND   '0001' IN ii.TrainActivityType AND ii.TrainType='1'
+RETURN s.PrimaryLocationName, i.ALA, sx.PrimaryLocationName, 
+       ix.ALA, ss.PrimaryLocationName, MIN(ii.ALA)
+\end{verbatim}
+
 \chapter{Způsob použití}
 
 \section{Neo4j}
 
 Pro spuštění je potřeba mít přístup k Neo4j databázi. Toho se dá dosáhnout několika způsoby, zde však budou uvedeny
-jenom dva nejpřímočařejší.
+jenom dva nejpřímočařejší. Je také potřeba mít v Pythonu doinstalovaný modul Neo4j: \verb|pip install neo4j|.
+Pro správnou funkčnost tohoto module je potřeba Python alespoň verze 3.6.
 
 \subsection{Databáze na cloudu}
 Pro tuto variantu je potřeba si založit účet na stránkách \href{https://neo4j.com/}{Neo4j} -> Get Started -> Start Free -> Sign up.
@@ -417,20 +441,131 @@ n
 \end{verbatim}
 
 \chapter{Experimenty}
+Experimenty byly prováděny na přístroji s tímto HW/SW:
+\begin{itemize}
+    \item OS: Pos os 22.04
+    \item CPU: Ryzen 5 5600X
+    \item RAM: 16 GB
+\end{itemize}
+Experimenty byly prováděny vůči lokálně běžící databázi.
 
-\paragraph{Cíl:}
-Změřit, jak aplikace a databáze fungují v praxi.
+\section{Inicializace databáze}
 
-\paragraph{Obsah:}
-Popis výchozí konfigurace aplikace a nasazení databáze stroje, kde budou experimenty probíhat (HW a SW).
-Popis experimentů typicky představující nahrání dat ze zdroje do databáze či dotazy ze zedání s výslednými časy jejich provedení.
-Případné poznámky k výsledkům experimentů.
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Počet spracovaných souborů & 13 051 \\
+    \hline
+    Doba provedení &  22,9 h \\
+    \hline
+    Vytvořených GOES IN vazeb & 5 781 132 \\
+    \hline
+    Vytvořených IS IN vazeb & 552 858 \\
+    \hline
+\end{tabular}
 
-\paragraph{Prostředky:}
-Strukturvaný text, případně tabulka či graf s doprovodným textem.
+\section{Dotazování}
 
-\paragraph{Fáze projektu:}
-Testování řešení před předáním výsledného systému zákazníkovi.
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Ropice zastávka \\
+    \hline
+    Cílová stanice & Dolní Lutyně \\
+    \hline
+    Datetime & 2022-03-31T00:00:00 \\
+    \hline
+    Doba provedení & 1.1645660400390625s \\
+    \hline
+    \multirow{12}{*}{Výsledek} & Ropice zastávka -- 17:36:00 \\
+     & Český Těšín nákl.n. -- 17:38:00 \\
+     & Český Těšín -- 17:39:00 \\
+     & 2.TK loucká -- 17:44:30 \\
+     & Chotěbuz (Kocobędz) -- 17:45:00 \\
+     & Louky nad Olší -- 17:47:30 \\
+     & Karviná-Darkov -- 17:55:00 \\
+     & Stan. Karviná-Darkov -- 17:55:30 \\
+     & Karviná hl. n. -- 17:58:00 \\
+     & Koukolná odbočka -- 18:01:00 \\
+     & Dětmarovice -- 18:03:00 \\
+     & Dolní Lutyně -- 18:06:30 \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Mosty u Jablunkova \\
+    \hline
+    Cílová stanice & Ostrava hl.n. \\
+    \hline
+    Datetime & 2022-03-31T00:00:00 \\
+    \hline
+    Doba provedení & 1.1052453517913818 \\
+    \hline
+    Výsledek & No connection found. \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Mosty u Jablunkova \\
+    \hline
+    Cílová stanice & Ostrava hl.n. \\
+    \hline
+    Datetime & 2022-03-31T00:00:00 \\
+    \hline
+    Doba provedení & 1.1052453517913818 \\
+    \hline
+    Výsledek & No connection found. \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Rajhrad \\
+    \hline
+    Cílová stanice & Rajhrad \\
+    \hline
+    Datetime & 2022-06-06T00:00:00 \\
+    \hline
+    Doba provedení & 0.6875042915344238s \\
+    \hline
+    Výsledek & No connection found. \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Rajhrad \\
+    \hline
+    Cílová stanice & Brno-Královo Pole \\
+    \hline
+    Datetime & 2022-10-24T00:00:00 \\
+    \hline
+    Doba provedení & 0.01873946189880371s \\
+    \hline
+    Výsledek & No connection found. \\
+    \hline
+\end{tabular}
+
+\vspace{1em}
+\begin{tabular}{|l|l|}
+    \hline
+    Výchozí stanice & Rajhrad \\
+    \hline
+    Cílová stanice & Brno hl.n. \\
+    \hline
+    Datetime & 2022-24-10T00:00:00 \\
+    \hline
+    Doba provedení & 0.23762035369873047s \\
+    \hline
+    Výsledek & No connection found. \\
+    \hline
+\end{tabular}
 
 \section{Rychlost zpracování XML souborů}
 Funkčnost a efektivita skriptu \verb|parser.py| byla testována nad složkou \verb|GVD2022|, která obsahuje přibližně 12300 souborů formátu XML. Všechny soubory byly v experimentu zpracovány a výpis důležitých informací vytisknut na standardní výstup. Tato operace trvala 93 sekund, tedy cca 132 zpracovaných souborů za sekundu.
