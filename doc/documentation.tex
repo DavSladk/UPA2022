@@ -341,6 +341,9 @@ Každá s těchto informací se nachází ve vlastní „větvi“ v souboru. Na
 \subsection{Zvolené Prostředky}
 Zpracovávání souborů je implementováno v jazyce Python v souboru \verb|parser.py|. Je využito modulu \verb|xml|, který je součástí základní instalace Pythonu, není třeba jej dodatečně instalovat. Tento modul obsahuje třídu \verb|ElementTree|, která umožňuje snadné nahrávání dat ze stromové struktury souboru. Velmi užitečnou funkcí je možnost adresování uzlů pomocí „cesty“ - obdobným způsobem jako adresování souborů v souborovém systému.
 
+\subsection{Sťahovanie dát}
+Súbory sú stiahnuté prostredníctvom súboru \verb|download.py| v jazyku Python. Bola využitá knihovna \verb|BeautifulSoup4|, ktorá slúži na získavanie dát z HTML súborov. Ďalším podstatným modulom je \verb|requests|, využitý na volanie GET požiadavkov na stiahnutie \verb|zip| súborov. Súbor \verb|download.py| obsahuje dve triedy; \verb|DataDownload| a \verb|DataExtract|. Pomocou prvej triedy sa stiahnu všetky doposiaľ nestiahnuté súbory náležiace danému roku jízdnich radov a uložia sa do priečinku \verb|/zips|. Druhou triedou sú tieto súbory extrahované už v podobe \verb|xml| súborov, pripravených na ďalšie spracovanie.
+
 \subsection{Způsob implementace}
 Nejdůležitější roli při zpracovávání hraje funkce \verb|node_to_dict|, která rekurzivně prohledává daný uzel a převádí jeho obsah na slovníkový datový typ.
 
