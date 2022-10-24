@@ -271,7 +271,6 @@ class Database:
             "AND   d.Date=$date "
             "AND   time(ix.ALA) > time(i.ALA) "
             "AND   time(ix.ALA) < time(ii.ALA) "
-            "AND   time(ix.ALA) < time(ii.ALA) "
             "AND   '0001' IN i.TrainActivityType AND i.TrainType='1' "
             "AND   '0001' IN ii.TrainActivityType AND ii.TrainType='1' "
             "RETURN s.PrimaryLocationName, i.ALA, sx.PrimaryLocationName, ix.ALA, ss.PrimaryLocationName, ii.ALA " 
@@ -281,6 +280,8 @@ class Database:
         start = {}
         end = {}
         for row in result:
+            if not end == {"location":row["ss.PrimaryLocationName"], "time":row["ii.ALA"].split('.')[0]} and end:
+                break
             start = {"location":row["s.PrimaryLocationName"], "time":row["i.ALA"].split('.')[0]}
             to_return.append({"location":row["sx.PrimaryLocationName"], "time":row["ix.ALA"].split('.')[0]})
             end = {"location":row["ss.PrimaryLocationName"], "time":row["ii.ALA"].split('.')[0]}
