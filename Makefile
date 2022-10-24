@@ -12,4 +12,4 @@ clean:
 	rm -f xkolec08_xmorav41_xsladk07.zip
 
 zip: clean
-	zip -r xkolec08_xmorav41_xsladk07.zip app.py database.py download.py parser.py Makefile README.md doc
+	zip -r xkolec08_xmorav41_xsladk07.zip app.py database.py download.py parser.py query.py Makefile README.md doc
