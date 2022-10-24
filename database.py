@@ -273,7 +273,7 @@ class Database:
             "AND   time(ix.ALA) < time(ii.ALA) "
             "AND   '0001' IN i.TrainActivityType AND i.TrainType='1' "
             "AND   '0001' IN ii.TrainActivityType AND ii.TrainType='1' "
-            "RETURN s.PrimaryLocationName, i.ALA, sx.PrimaryLocationName, ix.ALA, ss.PrimaryLocationName, ii.ALA " 
+            "RETURN s.PrimaryLocationName, i.ALA, sx.PrimaryLocationName, ix.ALA, ss.PrimaryLocationName, MIN(ii.ALA) " 
         )
         result = tx.run(query, station1=init_station, station2=terminal_station, time=time, date=date)
         to_return = []
