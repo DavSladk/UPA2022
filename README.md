@@ -1,6 +1,6 @@
 # UPA2022
 
-Hodnocení: ?/8
+Hodnocení: 8/8
 
 ## Usage
 `python3 app.py login password uri`
